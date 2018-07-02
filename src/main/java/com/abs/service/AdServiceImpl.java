@@ -11,19 +11,32 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AdServiceImpl implements  AdServiceI {
     @Value("${adImage.savePath}")
     private String adImageSavePath;
+    @Value("${adImage.url}")
+    private String adImageUrl;
     @Autowired
     private AdDao adDao;
 
 
     @Override
-    public List<Ad> search(AdDto adDto) {
-        return adDao.selectByPage(adDto);
+    public List<AdDto> search(AdDto adDto) {
+        List<AdDto> result= new ArrayList<AdDto>();
+        Ad condition= new Ad();
+        BeanUtils.copyProperties(adDto,condition);
+        List<Ad> adList=adDao.selectByPage(condition);
+        for (Ad ad:adList) {
+            AdDto adDtoTemp = new AdDto();
+            result.add(adDtoTemp);
+            adDtoTemp.setImg(adImageUrl + ad.getImgFileName());
+            BeanUtils.copyProperties(ad,adDtoTemp);
+        }
+        return result;
     }
 
     @Override

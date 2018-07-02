@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="sgwm-admin:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="sgwm-admin.war">
-      <element id="artifact" artifact-name="sgwm-admin:war exploded" />
-    </root>
-  </artifact>
-</component>

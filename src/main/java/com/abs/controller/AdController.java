@@ -52,21 +52,21 @@ public class AdController {
             pn=1;
         AdDto adDto= new AdDto();
         PageHelper.startPage(pn, 6);
-        List<Ad> adlist=adServiceI.search(adDto);
-        PageInfo<Ad> p = new PageInfo<Ad>(adlist);
+        List<AdDto> adlist=adServiceI.search(adDto);
+        PageInfo<AdDto> p = new PageInfo<AdDto>(adlist);
         model.addAttribute("pageinfo",p);
         model.addAttribute("list",adlist);
         return "/content/adList";
     }
     @RequestMapping("/getadlist/{pn}")
     @ResponseBody
-    public List<Ad> getAdList(@PathVariable("pn") Integer pn, ModelMap model){
+    public List<AdDto> getAdList(@PathVariable("pn") Integer pn, ModelMap model){
         if(pn==null || pn==0)
             pn=1;
         AdDto adDto= new AdDto();
         PageHelper.startPage(pn, 6);
-        List<Ad> adlist=adServiceI.search(adDto);
-        PageInfo<Ad> p = new PageInfo<Ad>(adlist);
+        List<AdDto> adlist=adServiceI.search(adDto);
+        PageInfo<AdDto> p = new PageInfo<AdDto>(adlist);
         model.addAttribute("pageinfo",p);
         return adlist;
     }
@@ -76,7 +76,7 @@ public class AdController {
      * */
     @RequestMapping(value = "/search",method = RequestMethod.GET)
     @ResponseBody
-    public List<Ad> search(@RequestParam("name") String name,ModelMap model){
+    public List<AdDto> search(@RequestParam("name") String name,ModelMap model){
         AdDto adDto = new AdDto();
         if((name.trim()!="" ||name !=null)) {
             try {
@@ -85,7 +85,7 @@ public class AdController {
             }
             adDto.setTitle(name);
         }
-        List<Ad> adlist=adServiceI.search(adDto);
+        List<AdDto> adlist=adServiceI.search(adDto);
         return adlist;
     }
 

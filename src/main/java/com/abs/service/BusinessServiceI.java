@@ -17,7 +17,7 @@ public interface BusinessServiceI {
     /**
      * 查单个
      * */
-    Business getBusinessById(long id);
+    BusinessDto getBusinessById(long id);
 
     /**
      *根据条件查找

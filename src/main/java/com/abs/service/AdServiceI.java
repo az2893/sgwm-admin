@@ -6,7 +6,7 @@ import com.abs.dto.AdDto;
 import java.util.List;
 
 public interface AdServiceI {
-    List<Ad> search(AdDto adDto);
+    List<AdDto> search(AdDto adDto);
 
     Ad getAdByid(long id);
 

@@ -16,4 +16,24 @@ public class BusinessDto extends Business {
     }
 
     private MultipartFile multipartFile;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    private String img;
+
+    public int getStar() {
+        return star;
+    }
+
+    public void setStar(int star) {
+        this.star = star;
+    }
+
+    private int star;
 }

@@ -19,6 +19,8 @@ import java.util.List;
 public class BusinessServiceImpl implements BusinessServiceI {
     @Value("${businessImage.savePath}")
     private String savePath;
+    @Value("${businessImage.url}")
+    private String imgUrl;
     @Autowired
     private BusinessDao businessDao;
     @Override
@@ -28,8 +30,15 @@ public class BusinessServiceImpl implements BusinessServiceI {
     }
 
     @Override
-    public Business getBusinessById(long id) {
-        return businessDao.selectById(id);
+    public BusinessDto getBusinessById(long id) {
+        Business business=businessDao.selectById(id);
+        if(business==null)
+            return null;
+        BusinessDto businessDto= new BusinessDto();
+        BeanUtils.copyProperties(business,businessDto);
+        businessDto.setImg(imgUrl+business.getImgFileName());
+        businessDto.setStar(this.getStarsNumber(business));
+        return businessDto;
     }
 
     @Override
@@ -83,6 +92,14 @@ public class BusinessServiceImpl implements BusinessServiceI {
             return 1001;
         }
         return 301;
+    }
+
+    public int getStarsNumber(Business business){
+        if(business.getStarTotalNum()!=null && business.getCommentTotalNum()!=null && business.getCommentTotalNum()!=0){
+            return (int)(business.getStarTotalNum()/business.getCommentTotalNum());
+        }
+        else
+            return 0;
     }
 
 
