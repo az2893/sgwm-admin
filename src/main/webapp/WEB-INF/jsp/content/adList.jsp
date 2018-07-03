@@ -6,20 +6,20 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE"/>
 		<title></title>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/all.css"/>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/pop.css"/>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/main.css"/>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/jquery.page.css"/>
-		<script type="text/javascript" src="${basePath}/js/common/jquery-1.8.3.js"></script>
-		<script type="text/javascript" src="${basePath}/js/common/common.js"></script>
-		<script type="text/javascript" src="${basePath}/js/common/jquery.page.js"></script>
-		<script type="text/javascript" src="${basePath}/js/content/adList.js"></script>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/all.css"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/pop.css"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/main.css"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery.page.css"/>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/common/jquery-1.8.3.js"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/common/common.js"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/common/jquery.page.js"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/content/adList.js"></script>
 	</head>
 	<body style="background: #e1e9eb;">
-		<form action="${basePath}/ad/search" id="mainForm" method="post">
+		<form action="${pageContext.request.contextPath}/ad/search" id="mainForm" method="post">
 			<input type="hidden" id="id" name="id"/>
 			<input type="hidden" id="message" value="${pageCode.msg}"/>
-			<input type="hidden" id="basePath" value="${basePath}"/>
+			<input type="hidden" id="basePath" value="${pageContext.request.contextPath}"/>
 			<input type="hidden" name="page.currentPage" id="currentPage" value="1"/>
 			<div class="right">
 				<div class="current">当前位置：<a href="#">内容管理</a> &gt; 广告管理</div>
@@ -35,7 +35,7 @@
 	                            <td style="text-align: right;" width="150">
 	                            	<input class="tabSub" value="查询" onclick="search();"  type="button"/>&nbsp;&nbsp;&nbsp;&nbsp;
 
-	                            		<input class="tabSub" value="添加" onclick="location.href='${basePath}/ad/addInit'" type="button"/>
+	                            		<input class="tabSub" value="添加" onclick="location.href='${pageContext.request.contextPath}/ad/addInit'" type="button"/>
 
 	                            </td>
 	       					</tr>
@@ -85,7 +85,7 @@
                     callBack : function(page){
                         $.ajax({
                             type: 'get',
-                            url: "${basePath}/ad/getadlist/"+page,
+                            url: "${pageContext.request.contextPath}/ad/getadlist/"+page,
                             dataType: "json",
                             success: function (data) {
                                 var tbody=window.document.getElementById("tab");

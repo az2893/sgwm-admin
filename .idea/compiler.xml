@@ -9,8 +9,5 @@
         <module name="sgwm-admin" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="sgwm-admin" target="1.7" />
-    </bytecodeTargetLevel>
   </component>
 </project>

@@ -2,13 +2,10 @@ package com.abs.controller;
 
 import com.abs.Util.CommonUtil;
 import com.abs.bean.Business;
-import com.abs.dto.AdDto;
-import com.abs.dto.ApiCodeDto;
-import com.abs.dto.BusinessDto;
-import com.abs.dto.BusinessListDto;
-import com.abs.service.AdServiceI;
-import com.abs.service.BusinessServiceI;
-import com.abs.service.MemberServiceI;
+import com.abs.bean.Comment;
+import com.abs.bean.Orders;
+import com.abs.dto.*;
+import com.abs.service.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +24,10 @@ public class APIController {
     private BusinessServiceI businessServiceI;
     @Autowired
     private MemberServiceI memberServiceI;
+    @Autowired
+    private OrdersServiceI ordersServiceI;
+    @Autowired
+    private CommentServiceI commentServiceI;
 
     /**
      * 广告列表
@@ -122,14 +123,14 @@ public class APIController {
         ApiCodeDto result;
         // 1.判断用户名是否存在
         result=memberServiceI.checkPhone(phone);
-        if(result.getError()==1)
+        if(result.getErrno()==1)
             return result;
         //2.发送验证码
         String code=CommonUtil.getCode(6);
         if(memberServiceI.saveCode(phone,code)){
             //保存成功
             result= memberServiceI.sendCode(phone,code);
-            if(result.getError()==0){
+            if(result.getErrno()==0){
                 //发送成功
                 result.setMsg(code);
                 return  result;
@@ -140,11 +141,77 @@ public class APIController {
                 return  result;
             }
         }else{
-            result.setError(2);
+            result.setErrno(2);
             result.setMsg("您点击太快了，请稍等一下吧");
             return result;
         }
     }
+
+    /**
+     * 用户订单列表
+     * @id 用户ID
+     * */
+    @RequestMapping(value = "/orderlist/{id}",method = RequestMethod.GET)
+    @ResponseBody
+    public List<OrdersDto> getListByUserId(@PathVariable("id")long id){
+        OrdersDto ordersDto= new OrdersDto();
+        ordersDto.setBusinessId(id);
+        return ordersServiceI.getOrderlistBuUserId(ordersDto);
+    }
+    /**
+     *购买
+     * @
+     * */
+    @RequestMapping(value = "/order")
+    @ResponseBody
+    public ApiCodeDto buy(OrderForBuyDto orderForBuyDto){
+        ApiCodeDto apiCodeDto;
+        //1.判断是否登录
+        if(orderForBuyDto.getToken()!=null){
+            String token=orderForBuyDto.getToken();
+            //检查token
+            long phone=memberServiceI.getPhone(token);
+            if(phone!=orderForBuyDto.getUsername()){
+                apiCodeDto= new ApiCodeDto();
+                apiCodeDto.setErrno(2);
+                apiCodeDto.setMsg("登录失败，请重新登录");
+            }
+            //登录成功
+            //检查价格，防止用户修改
+            BusinessDto businessDto=businessServiceI.getBusinessById(orderForBuyDto.getId());
+            orderForBuyDto.setPrice(businessDto.getPrice());
+           apiCodeDto= ordersServiceI.buy(orderForBuyDto);
+           return apiCodeDto;
+        }else{
+            apiCodeDto= new ApiCodeDto();
+            apiCodeDto.setErrno(1);
+            apiCodeDto.setMsg("请先登录");
+            return apiCodeDto;
+        }
+    }
+    /**
+     * 评论－列表
+     * */
+    @RequestMapping(value="detail/comment/{pn}/{id}",method = RequestMethod.GET)
+    @ResponseBody
+    public CommentListDto getCommentDetailList(@PathVariable("pn")int pn,@PathVariable("id") long id){
+        pn++;
+        PageHelper.startPage(pn,7);
+        List<CommentDto> list=commentServiceI.getCommenList(id);
+        PageInfo<CommentDto> info=new PageInfo<CommentDto>(list);
+        CommentListDto result= new CommentListDto();
+        result.setHasMore(info.isHasNextPage());
+        result.setData(list);
+        return result;
+    }
+    /**
+     * 提交评论
+     * */
+    @RequestMapping(value = "/submitComment", method = RequestMethod.POST)
+    public ApiCodeDto submitComment(){
+        return  null;
+    }
+
 
 
 

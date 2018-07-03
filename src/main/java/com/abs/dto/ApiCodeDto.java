@@ -1,13 +1,7 @@
 package com.abs.dto;
 
 public class ApiCodeDto {
-    public int getError() {
-        return error;
-    }
 
-    public void setError(int error) {
-        this.error = error;
-    }
 
     public String getMsg() {
         return msg;
@@ -25,7 +19,15 @@ public class ApiCodeDto {
         this.token = token;
     }
 
-    private int error;
+    public int getErrno() {
+        return errno;
+    }
+
+    public void setErrno(int errno) {
+        this.errno = errno;
+    }
+
+    private int errno;
     private String msg;
     String token;
 }

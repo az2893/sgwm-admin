@@ -6,16 +6,16 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE"/>
 		<title></title>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/all.css"/>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/pop.css"/>
-		<link rel="stylesheet" type="text/css" href="${basePath}/css/main.css"/>
-		<script type="text/javascript" src="${basePath}/js/common/jquery-1.8.3.js"></script>
-		<script type="text/javascript" src="${basePath}/js/content/businessList.js"></script>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/all.css"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/pop.css"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/main.css"/>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/common/jquery-1.8.3.js"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/content/businessList.js"></script>
 	</head>
 	<body style="background: #e1e9eb;">
-		<form action="${basePath}/businesses/search" id="mainForm" method="post">
+		<form action="${pageContext.request.contextPath}/businesses/search" id="mainForm" method="post">
 			<input type="hidden" name="_method" value="DELETE"/>
-			<input type="hidden" id="basePath" value="${basePath}"/>
+			<input type="hidden" id="basePath" value="${pageContext.request.contextPath}"/>
 			<input type="hidden" name="page.currentPage" id="currentPage" value="1"/>
 			<div class="right">
 				<div class="current">当前位置：<a href="#">内容管理</a> &gt; 商户管理</div>
@@ -31,7 +31,7 @@
 	                            <td style="text-align: right;" width="150">
 	                            	<input class="tabSub" value="查询" onclick="search('1');" type="button"/>&nbsp;&nbsp;&nbsp;&nbsp;
 
-	                            		<input class="tabSub" value="添加" onclick="location.href='${basePath}/businesses/addPage'" type="button"/>
+	                            		<input class="tabSub" value="添加" onclick="location.href='${pageContext.request.contextPath}/businesses/addPage'" type="button"/>
 
 	                            </td>
 	       					</tr>
