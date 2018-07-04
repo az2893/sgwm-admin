@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,8 +43,22 @@ public class BusinessServiceImpl implements BusinessServiceI {
     }
 
     @Override
-    public List<Business> getListByparam(Business business) {
-        return businessDao.selectAll(business);
+    public List<BusinessDto> getListByparam(Business business) {
+        if(business.getCategory()!=null && business.getCategory()!="") {
+            if (business.getCategory().equals("all")) {
+                business.setCategory("");
+            }
+        }
+        List<Business> list= businessDao.selectAll(business);
+        List<BusinessDto> result= new ArrayList<BusinessDto>();
+        for (Business b:list) {
+            BusinessDto businessDto= new BusinessDto();
+            BeanUtils.copyProperties(b,businessDto);
+            businessDto.setImg(imgUrl+b.getImgFileName());
+            businessDto.setStar(this.getStarsNumber(b));
+            result.add(businessDto);
+        }
+        return result;
     }
 
     @Override
@@ -82,16 +97,15 @@ public class BusinessServiceImpl implements BusinessServiceI {
         if(businessDto.getMultipartFile()!=null && businessDto.getMultipartFile().getSize()>0){
             String fileName= FileUploadUtil.upload(businessDto.getMultipartFile(),savePath);
             business.setImgFileName(fileName);
-            //默认销量为0
-            business.setNumber(0);
-            //默认评论总数为0
-            business.setCommentTotalNum(0L);
-            //默认评论星星总数
-            business.setStarTotalNum(0L);
             businessDao.updateBusiness(business);
             return 1001;
         }
         return 301;
+    }
+
+    @Override
+    public int updateNumber(long id) {
+        return businessDao.updateNumber(id);
     }
 
     public int getStarsNumber(Business business){

@@ -42,16 +42,26 @@ public interface BusinessDao {
     List<Business> selectLikeByPage(Business business);
     
     /**
-     * 更新商户的【统计评论星星总数】、【统计评论总次数】，商户的【星级】用这两个字段数据计算得出
-     * @param map
+     * 更新商户的【统计评论星星总数】
+     *
      * @return
      */
-    int updateStar(Map<String, Date> map);
+    int updateStar(Long id);
+    /**
+     * 更新商户 评论数量
+     * @id
+     * */
+    int updateCommentNumbers(Long id);
 
     /**
      * 更新商户的信息
      * */
     int updateBusiness(Business business);
+
+    /**
+     * 更新商户销量
+     * */
+    int updateNumber(Long id);
 
     /**
      * 删除商户

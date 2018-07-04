@@ -3,7 +3,9 @@ package com.abs.controller;
 import com.abs.Util.CommonUtil;
 import com.abs.bean.Business;
 import com.abs.bean.Comment;
+import com.abs.bean.Member;
 import com.abs.bean.Orders;
+import com.abs.constant.ApiCodeEnum;
 import com.abs.dto.*;
 import com.abs.service.*;
 import com.github.pagehelper.PageHelper;
@@ -60,8 +62,8 @@ public class APIController {
     public BusinessListDto getList(Business business,@PathVariable("pn") int pn){
         pn++;
         PageHelper.startPage(pn,5);
-        List<Business> businessList=businessServiceI.getListByparam(business);
-        PageInfo<Business> pageInfo= new PageInfo<Business>(businessList);
+        List<BusinessDto> businessList=businessServiceI.getListByparam(business);
+        PageInfo<BusinessDto> pageInfo= new PageInfo<BusinessDto>(businessList);
         BusinessListDto result= new BusinessListDto();
         result.setHasMore(pageInfo.isHasNextPage());
         result.setData(businessList);
@@ -77,8 +79,8 @@ public class APIController {
     public BusinessListDto searchBusiness(Business business,@PathVariable("pn") int pn){
         pn=pn+1;
         PageHelper.startPage(pn,5);
-        List<Business> businessList=businessServiceI.getListByparam(business);
-        PageInfo<Business> pageInfo= new PageInfo<Business>(businessList);
+        List<BusinessDto> businessList=businessServiceI.getListByparam(business);
+        PageInfo<BusinessDto> pageInfo= new PageInfo<BusinessDto>(businessList);
         BusinessListDto result= new BusinessListDto();
         result.setHasMore(pageInfo.isHasNextPage());
         result.setData(businessList);
@@ -95,8 +97,8 @@ public class APIController {
         business.setTitle(keyword);
         pn++;
         PageHelper.startPage(pn,5);
-        List<Business> businessList=businessServiceI.getListByparam(business);
-        PageInfo<Business> pageInfo= new PageInfo<Business>(businessList);
+        List<BusinessDto> businessList=businessServiceI.getListByparam(business);
+        PageInfo<BusinessDto> pageInfo= new PageInfo<BusinessDto>(businessList);
         BusinessListDto result= new BusinessListDto();
         result.setHasMore(pageInfo.isHasNextPage());
         result.setData(businessList);
@@ -111,6 +113,7 @@ public class APIController {
     @ResponseBody
     public ApiCodeDto login(@RequestParam("username") Long phone, String code){
        ApiCodeDto result= memberServiceI.login(phone,code);
+       //result.setErrno();
         return result;
     }
     /**
@@ -123,28 +126,19 @@ public class APIController {
         ApiCodeDto result;
         // 1.判断用户名是否存在
         result=memberServiceI.checkPhone(phone);
-        if(result.getErrno()==1)
+        if(result.getErrno()==ApiCodeEnum.USERNAME_ERROR.getCode())
             return result;
-        //2.发送验证码
+        //2.发送验证码 6位
         String code=CommonUtil.getCode(6);
         if(memberServiceI.saveCode(phone,code)){
             //保存成功
             result= memberServiceI.sendCode(phone,code);
-            if(result.getErrno()==0){
-                //发送成功
-                result.setMsg(code);
-                return  result;
-            }
-            else{
-                //发送失败
-                result.setMsg("发送失败，未知错误");
-                return  result;
-            }
+
         }else{
-            result.setErrno(2);
-            result.setMsg("您点击太快了，请稍等一下吧");
-            return result;
+            result.setErrno(ApiCodeEnum.CLICKQUICK_FAIL.getCode());
+            result.setMsg(ApiCodeEnum.CLICKQUICK_FAIL.getMsg());
         }
+        return result;
     }
 
     /**
@@ -173,19 +167,24 @@ public class APIController {
             long phone=memberServiceI.getPhone(token);
             if(phone!=orderForBuyDto.getUsername()){
                 apiCodeDto= new ApiCodeDto();
-                apiCodeDto.setErrno(2);
-                apiCodeDto.setMsg("登录失败，请重新登录");
+                apiCodeDto.setErrno(ApiCodeEnum.LOGIN_FAIL.getCode());
+                apiCodeDto.setMsg(ApiCodeEnum.LOGIN_FAIL.getMsg());
             }
             //登录成功
             //检查价格，防止用户修改
             BusinessDto businessDto=businessServiceI.getBusinessById(orderForBuyDto.getId());
             orderForBuyDto.setPrice(businessDto.getPrice());
+            //购买
            apiCodeDto= ordersServiceI.buy(orderForBuyDto);
+
+           //更新商品销量
+            businessServiceI.updateNumber(orderForBuyDto.getId());
+
            return apiCodeDto;
         }else{
             apiCodeDto= new ApiCodeDto();
-            apiCodeDto.setErrno(1);
-            apiCodeDto.setMsg("请先登录");
+            apiCodeDto.setErrno(ApiCodeEnum.NOT_LOGIN.getCode());
+            apiCodeDto.setMsg(ApiCodeEnum.NOT_LOGIN.getMsg());
             return apiCodeDto;
         }
     }
@@ -208,11 +207,53 @@ public class APIController {
      * 提交评论
      * */
     @RequestMapping(value = "/submitComment", method = RequestMethod.POST)
-    public ApiCodeDto submitComment(){
-        return  null;
+    @ResponseBody
+    public ApiCodeDto submitComment(CommentForSubmitDto commentForSubmitDto){
+        ApiCodeDto apiCodeDto;
+        //1.验证token
+        long usernameTemp=memberServiceI.getPhone(commentForSubmitDto.getToken());
+        if(!(usernameTemp==commentForSubmitDto.getUsername()))
+        {
+            apiCodeDto= new ApiCodeDto();
+            apiCodeDto.setErrno(ApiCodeEnum.NOT_LOGIN.getCode());
+            apiCodeDto.setMsg(ApiCodeEnum.NOT_LOGIN.getMsg());
+            return apiCodeDto;
+        }
+        //2.校验订单id和用户一致
+        Member memberTemp= new Member();
+        memberTemp.setPhone(usernameTemp);
+        Member m=memberServiceI.getMemberByparam(memberTemp);
+        Orders orders=ordersServiceI.getOrderById(commentForSubmitDto.getId());
+        if(orders.getMemberId()==m.getId()){
+            //开始评论
+            Comment comment= new Comment();
+            comment.setComment(commentForSubmitDto.getComment());
+            comment.setStar(commentForSubmitDto.getStar());
+            comment.setOrdersId(commentForSubmitDto.getId());
+            int code=commentServiceI.addComment(comment);
+            if(code==1){
+                apiCodeDto= new ApiCodeDto();
+                apiCodeDto.setErrno(0);
+                apiCodeDto.setMsg("评论成功");
+                //修改订单表 评论状态
+                orders.setCommentState(2);
+                ordersServiceI.updateCommentStatus(orders);
+                //更新商户星级
+                ordersServiceI.updateBusinessStarNumber(orders.getBusinessId());
+                //更新评论数量
+                ordersServiceI.updateBusinessCommentNumbers(orders.getBusinessId());
+
+            }else{
+                apiCodeDto= new ApiCodeDto();
+                apiCodeDto.setErrno(ApiCodeEnum.COMMENT_FAIL.getCode());
+                apiCodeDto.setMsg(ApiCodeEnum.COMMENT_FAIL.getMsg());
+            }
+            return apiCodeDto;
+        }
+        apiCodeDto= new ApiCodeDto();
+        apiCodeDto.setErrno(ApiCodeEnum.COMMENT_FAIL.getCode());
+        apiCodeDto.setMsg(ApiCodeEnum.COMMENT_FAIL.getMsg());
+        return  apiCodeDto;
     }
-
-
-
 
 }

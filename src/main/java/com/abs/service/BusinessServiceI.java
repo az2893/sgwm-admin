@@ -22,7 +22,7 @@ public interface BusinessServiceI {
     /**
      *根据条件查找
      * */
-    List<Business> getListByparam(Business business);
+    List<BusinessDto> getListByparam(Business business);
 
     /**
      *  add
@@ -32,6 +32,8 @@ public interface BusinessServiceI {
     int delete(long id);
 
     int modify(BusinessDto businessDto);
+
+    int updateNumber(long id);
 
 
 }

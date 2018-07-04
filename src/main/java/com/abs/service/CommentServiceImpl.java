@@ -37,9 +37,8 @@ public class CommentServiceImpl implements CommentServiceI{
         List<CommentDto> list= new ArrayList<CommentDto>();
         for (Comment c:commentList) {
             CommentDto commentDto= new CommentDto();
-            list.add(commentDto);
-            BeanUtils.copyProperties(comment,commentDto);
-            String usernameTemp=String.valueOf(comment.getOrders().getMember().getPhone());
+            BeanUtils.copyProperties(c,commentDto);
+            String usernameTemp=String.valueOf(c.getOrders().getMember().getPhone());
             StringBuffer sb= new StringBuffer(usernameTemp);
             sb.replace(3,9,"*******");
             commentDto.setUsername(sb.toString());
@@ -50,6 +49,8 @@ public class CommentServiceImpl implements CommentServiceI{
 
     @Override
     public int addComment(Comment comment) {
-        return 1;
+        int code=commentDao.insert(comment);
+
+        return code;
     }
 }

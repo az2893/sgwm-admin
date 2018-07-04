@@ -4,6 +4,7 @@ import com.abs.Util.CommonUtil;
 import com.abs.bean.Member;
 import com.abs.cache.CodeCache;
 import com.abs.cache.TokenCache;
+import com.abs.constant.ApiCodeEnum;
 import com.abs.dao.MemberDao;
 import com.abs.dto.ApiCodeDto;
 import org.slf4j.Logger;
@@ -25,19 +26,20 @@ public class MemberServiceImpl implements MemberServiceI {
         member.setPhone(phone);
         Member m=memberDao.select(member);
         if(m==null){
-            result.setErrno(1);
-            result.setMsg("用户名错误");
+            result.setErrno(ApiCodeEnum.USERNAME_ERROR.getCode());
+            result.setMsg(ApiCodeEnum.USERNAME_ERROR.getMsg());
             return  result;
         }
-        result.setErrno(0);
-        result.setMsg("");
+        //用户名正确
+        result.setErrno(ApiCodeEnum.USERNAME_TRUE.getCode());
+        result.setMsg(ApiCodeEnum.USERNAME_TRUE.getMsg());
         return  result;
     }
 
     @Override
     public ApiCodeDto sendCode(long phone, String code) {
         ApiCodeDto result= new ApiCodeDto();
-        result.setErrno(0);
+        result.setErrno(ApiCodeEnum.CODE_SEND_SUCCESS.getCode());
         result.setMsg(code);
         logger.info(phone+"|"+code);
         return result;
@@ -46,15 +48,16 @@ public class MemberServiceImpl implements MemberServiceI {
 
     @Override
     public ApiCodeDto login(long phone, String code) {
+        //检查手机号是否有效
         ApiCodeDto apiCodeDto=this.checkPhone(phone);
-        if(apiCodeDto.getErrno()==1)
+        if(apiCodeDto.getErrno()==ApiCodeEnum.USERNAME_ERROR.getCode())
             return apiCodeDto;
         CodeCache instance=CodeCache.getInstance();
         String realCode=instance.getCode(phone);
         ApiCodeDto result= new ApiCodeDto();
         if(realCode.equals(code)){
-            result.setErrno(0);
-            result.setMsg("登录成功");
+            result.setErrno(ApiCodeEnum.LOGIN_SUCCESS.getCode());
+            result.setMsg(ApiCodeEnum.LOGIN_SUCCESS.getMsg());
             //生成token
             String token=CommonUtil.getUUID();
             //保存token
@@ -62,8 +65,8 @@ public class MemberServiceImpl implements MemberServiceI {
             result.setToken(token);
         }
         else{
-            result.setErrno(3);
-            result.setMsg("登录失败，验证码不正确");
+            result.setErrno(ApiCodeEnum.LOGIN_FAIL.getCode());
+            result.setMsg(ApiCodeEnum.LOGIN_FAIL.getMsg());
         }
         return result;
     }
@@ -78,5 +81,10 @@ public class MemberServiceImpl implements MemberServiceI {
     @Override
     public long getPhone(String token){
         return TokenCache.getInstance().getPhone(token);
+    }
+
+    @Override
+    public Member getMemberByparam(Member member) {
+        return memberDao.select(member);
     }
 }

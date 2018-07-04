@@ -8,7 +8,7 @@
 		<result column="comment" property="comment" />
 		<result column="star" property="star" />
 		<result column="create_time" property="createTime" />
-		<association property="orders" resultMap="org.imooc.dao.OrdersDao.OrdersResultMap"/>
+		<association property="orders" resultMap="com.abs.dao.OrdersDao.OrdersResultMap"/>
 	</resultMap>
 
 	<insert id="insert">

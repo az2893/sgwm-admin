@@ -86,21 +86,29 @@
 	</select>
 	
 	<update id="updateNumber">
-		update business b,(select business_id,count(*) cou from orders group by business_id) c
-		set b.number=b.number + c.cou where b.id=c.business_id
+	UPDATE business b
+	set b.`number`=(select count(*) from orders o
+	where o.business_id=#{number})
+	where b.id=#{number}
 	</update>
 	
+
 	<update id="updateStar">
 		update business b,
-		
-		(select o.business_id,sum(c.star) star_num,count(*) comment_num from comment c,orders o where c.orders_id=o.id and c.create_time &lt;= #{endTime}
-		<if test="startTime != null">
-			and c.create_time &gt; #{startTime}
-		</if>
-		group by o.business_id)t
-		
-		set b.star_total_num = b.star_total_num + t.star_num,b.comment_total_num = b.comment_total_num + t.comment_num
+
+		(select o.business_id,sum(c.star) star_num,count(*) comment_num from comment c,orders o where c.orders_id=o.id
+		and o.business_id=#{_parameter}
+		group by o.business_id )t
+
+		set b.star_total_num = t.star_num
 		where b.id=t.business_id
+	</update>
+	<update id="updateCommentNumbers">
+		update business b
+		set b.comment_total_num=(
+		SELECT count(*) FROM comment c where c.orders_id in (
+		select id from orders o where o.business_id=#{_parameter}))
+		where b.id=#{_parameter}
 	</update>
 
 	<update id="updateBusiness">

@@ -1,5 +1,6 @@
 package com.abs.service;
 
+import com.abs.bean.Orders;
 import com.abs.dto.ApiCodeDto;
 import com.abs.dto.OrderForBuyDto;
 import com.abs.dto.OrdersDto;
@@ -14,5 +15,10 @@ public interface OrdersServiceI {
 
       ApiCodeDto buy(OrderForBuyDto orderForBuyDto);
 
+      int updateCommentStatus(Orders orders);
+
+      int updateBusinessStarNumber(long id);
+
+      int updateBusinessCommentNumbers(long id);
 
 }

@@ -13,14 +13,14 @@ public class BusinessListDto  {
         this.hasMore = hasMore;
     }
 
-    public List<Business> getData() {
+    public List<BusinessDto> getData() {
         return data;
     }
 
-    public void setData(List<Business> data) {
+    public void setData(List<BusinessDto> data) {
         this.data = data;
     }
 
     private boolean hasMore;
-    List<Business> data;
+    List<BusinessDto> data;
 }
