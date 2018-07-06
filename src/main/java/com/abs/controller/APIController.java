@@ -113,7 +113,6 @@ public class APIController {
     @ResponseBody
     public ApiCodeDto login(@RequestParam("username") Long phone, String code){
        ApiCodeDto result= memberServiceI.login(phone,code);
-       //result.setErrno();
         return result;
     }
     /**

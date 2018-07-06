@@ -58,17 +58,20 @@ public class MemberServiceImpl implements MemberServiceI {
         if(realCode.equals(code)){
             result.setErrno(ApiCodeEnum.LOGIN_SUCCESS.getCode());
             result.setMsg(ApiCodeEnum.LOGIN_SUCCESS.getMsg());
+
             //生成token
             String token=CommonUtil.getUUID();
             //保存token
             TokenCache.getInstance().save(token,phone);
             result.setToken(token);
+            return result;
         }
         else{
             result.setErrno(ApiCodeEnum.LOGIN_FAIL.getCode());
             result.setMsg(ApiCodeEnum.LOGIN_FAIL.getMsg());
+            return result;
         }
-        return result;
+       // return result;
     }
 
     @Override

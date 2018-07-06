@@ -10,9 +10,11 @@
 	<!-- 扫描service包 -->
 	<context:component-scan base-package="com.abs.service" />
 	<!-- 配置事务管理器 -->
-	<bean id="transactionManager"  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
-		<property name="dataSource" ref="dataSource"/>
+	<bean id="TransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" >
+		<property name="dataSource"  ref="dataSource" />
 	</bean>
-	<!-- 事务采用全注解方式 -->
-	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<tx:annotation-driven  transaction-manager="TransactionManager"/>
+
+
 </beans>
